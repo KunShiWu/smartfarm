@@ -1,0 +1,72 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: smartfarm-backend
+  jackson:
+    default-property-inclusion: non_null
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
+smartfarm:
+  # 上游物联网开放平台（接口文档见 Apipost）
+  upstream:
+    base-url: https://openapi.mordeniot.com/openapi/v1
+    # 开放平台账号（建议改用环境变量覆盖：SMARTFARM_UPSTREAM_ACCOUNT / PASSWORD）
+    account: ${SMARTFARM_UPSTREAM_ACCOUNT:}
+    password: ${SMARTFARM_UPSTREAM_PASSWORD:}
+  # 前端展示用的主机分组名（上游无分组概念）
+  host-group: 土壤检测
+  # 修改记录中的操作人
+  operator: admin
+  # 曲线图返回的历史数据点数
+  chart-points: 48
+  # 修改记录等本地数据存放目录
+  data-dir: ./data
+  # UAPI 天气服务。密钥仅从环境变量读取，不要写入源码。
+  weather:
+    base-url: https://uapis.cn
+    api-key: ${SMARTFARM_WEATHER_API_KEY:}
+    adcode: "350213"
+    default-city: 翔安区
+    default-latitude: 24.6109
+    default-longitude: 118.2953
+  # 萤石开放平台（视频监控）
+  ezviz:
+    base-url: https://open.ys7.com
+    # 建议改用环境变量覆盖：SMARTFARM_EZVIZ_APP_KEY / APP_SECRET
+    app-key: ${SMARTFARM_EZVIZ_APP_KEY:}
+    app-secret: ${SMARTFARM_EZVIZ_APP_SECRET:}
+    device-serial: ${SMARTFARM_EZVIZ_DEVICE_SERIAL:}
+    channel-no: 1
+  # DeepSeek 大模型（农田分析 agent）
+  # 注意：deepseek-v4-pro 是纯文本模型，读取监控截图由 vision-model(deepseek-flash) 负责
+  deepseek:
+    base-url: https://api.deepseek.com
+    # 建议改用环境变量覆盖：SMARTFARM_DEEPSEEK_API_KEY
+    api-key: ${SMARTFARM_DEEPSEEK_API_KEY:}
+    vision-model: deepseek-flash
+    reason-model: deepseek-v4-pro
+    timeout-seconds: 120
+    # 推理强度:low/high/max,越低越快(缩短等待时间)
+    reasoning-effort: low
+  # 米家桥接服务（app.py，已部署到云服务器，Mac 上经 SSH 隧道映射后本地访问）
+  mijia:
+    bridge:
+      # 先在本机执行隧道: ssh -N -L 18083:127.0.0.1:18081 root@116.204.111.100
+      base-url: ${SMARTFARM_MIJIA_BASE_URL:http://127.0.0.1:18083}
+      # 鉴权 Token:需与云服务器上桥接服务进程的 MIJIA_BRIDGE_TOKEN 环境变量一致
+      token: ${MIJIA_BRIDGE_TOKEN:}
+      # 受控设备 id,对应 app.py 中 DEVICES 的键名
+      device-id: outdoor_pump
+    # 米家云端调用要走子进程,耗时较长,超时放宽
+    request-timeout-seconds: 40
+  agent:
+    base-url: ${SMARTFARM_AGENT_BASE_URL:http://127.0.0.1:8002}
+logging:
+  level:
+    com.smartfarm: info

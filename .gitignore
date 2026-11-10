@@ -1,0 +1,18 @@
+# Private runtime credentials. Keep locally; include only in archives for trusted recipients.
+config/runtime-secrets.env
+
+# Runtime logs and build outputs
+logs/
+smartfarm_backend/target/
+smartfarm_front/dist/
+smartfarm_front/node_modules/
+
+# IDE and operating system files
+.idea/
+.screenshots/
+.DS_Store
+
+# Local environment files
+.env
+.env.*
+!.env.example
